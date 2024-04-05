@@ -1,12 +1,56 @@
-import React from 'react'
+import React, { useState } from 'react'
 import logo from "../assests/logo.svg"
 import {IoMenuOutline, IoPencil} from "react-icons/io5"
 import {CiSearch} from "react-icons/ci"
 import { MdLocationOn } from "react-icons/md"
 import {FaUser, FaShoppingCart} from "react-icons/fa"
+import {RxCross1} from "react-icons/rx"
 import Box from './Box'
+import Modal from './Modal'
+import { Link } from 'react-router-dom'
+import Menu from './menuDropdown/Menu'
+import axios from 'axios'
 
-function header() {
+
+
+
+function Header() {
+  const [open, setOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isSearchFocused, setSearchFocused] = useState(false);
+  
+  function closeModal() {
+    setModalOpen(false);
+  }
+
+  const handleFocus=()=>{
+     setSearchFocused(true)
+  } 
+  const handleBlur=(e)=>{
+    // console.log("e", e)
+    if(e.target.closest("[data-search-content]")) return
+    setSearchFocused(false)
+    
+ } 
+ const [searchResult, setSearchResult] = useState([])
+
+ const handleChange=(e)=>{
+  let text = e.target.value
+  axios({
+    method: "GET",
+    url:`https://academics.newtonschool.co/api/v1/ecommerce/electronics/products?search={"name":"${text}"}`,
+    headers:{
+      projectID: "f104bi07c490"
+    }
+    }).then(res => {
+       setSearchResult(res.data.data)
+      // console.log("res", res)
+    })
+    .catch(e => {
+    console.error(e)
+    })
+ }
+ 
   return (
     <header className='bg-black text-white flex justify-between h-20'>
       {/*desktop and table version*/}
@@ -20,12 +64,46 @@ function header() {
                  <img src={logo} alt='logo here' className='w-full'/>
               </div>
             <div className='flex items-center'>
-                <IoMenuOutline className='text-3xl'/>
-                <p className='text-sm'>Menu</p>
+              <div onClick={() => {
+                  setOpen(!open)
+               }}>
+                {isModalOpen === true ? (
+                 <RxCross1 className='text-3xl menubar cursor-pointer' 
+                    onClick={() => {
+                      setModalOpen(false);
+                  }}/>
+               ) : (
+                <IoMenuOutline className='text-3xl'
+                    onClick={() => {
+                      setModalOpen(true);
+                    }}/>
+               )}       
               </div>
-                <div className='flex items-center bg-white h-9 w-full max-w-md px-2 rounded-md'>
-                  <input type="text" placeholder='What are you looking for?'className='w-full bg-transparent outline-none border-none px-3 placeholder:text-sm text-black'/>
+                {/* {isModalOpen && (
+                  <Modal closeModal={closeModal}>
+                    <Menu closeModal={closeModal} />
+                  </Modal>
+                )} */}
+                <div className='relative'>
+                <p className='text-sm'>Menu</p>
+                {/* {isModalOpen && <Menu />} */}
+                <Menu show={isModalOpen} />
+                </div>
+              </div>
+                <div className='flex items-center bg-white h-9 w-full max-w-md px-2 rounded-md relative'>
+                  <input type="text"  onFocus={handleFocus} onBlur={handleBlur} onChange={handleChange} placeholder='What are you looking for?'className='w-full bg-transparent outline-none border-none px-3 placeholder:text-sm text-black'/>
                   <CiSearch className='text-black text-2xl'/>
+                   {isSearchFocused && searchResult.length > 0 &&
+                    <div data-search-content className='absolute px-[1rem] pt-[.5rem] bg-black top-10 left-0 w-[100%] gap-[.5rem] pb-[10px]'>
+                    {searchResult.map(item=>{
+                      return(
+                    <a href='#' key={item.id} className='text-md text-[15px]  border-b border-b-[white]'>{item.name}</a>
+                        
+                      )
+                    })
+                  }
+                    </div>
+                   }
                 </div>
              </div>
          
@@ -39,8 +117,8 @@ function header() {
               <div className='text-2xl'>
                     <FaUser/>
               </div>
-              <div className='text-2xl relative'>
-                    <FaShoppingCart/>
+              <div className='text-2xl relative cursor-pointer'>
+                 <Link to='/cart'> <FaShoppingCart/></Link>  
                     <p className='text-xs w-3 text-center h-3 flex items-center justify-center rounded-full bg-greenblue absolute top-0 -right-2 text-black'>0</p>
               </div>
 
@@ -62,15 +140,17 @@ function header() {
                       <div className='text-xl'>
                          <FaUser/>
                      </div>
-                      <div className='text-xl relative'>
-                         <FaShoppingCart/>
-                        <p className='text-xs w-3 text-center h-3 flex items-center justify-center rounded-full bg-greenblue absolute top-0 -right-2 text-black'>0</p>
+                      <div className='text-xl relative cursor-pointer '>
+                        <Link to='/cart' >  <FaShoppingCart className=''/></Link>
+                       
+                        <p className='text-xs w-3 text-center h-3 flex items-center justify-center rounded-full bg-greenblue absolute top-0 -right-2 text-black'>1000</p>
                       </div>
               </div>
              </div>
-            <div className='flex items-center bg-white h-7 w-full max-w-full px-2 mt-1 rounded-md'>
+            <div className='flex items-center bg-white h-7 w-full max-w-full px-2 mt-1 rounded-md relative'>
                   <input type="text" placeholder='What are you looking for?'className='w-full bg-transparent outline-none border-none px-3 placeholder:text-sm text-black'/>
                   <CiSearch className='text-black text-2xl'/>
+                 
               </div>
           </div>
          </Box>
@@ -81,4 +161,4 @@ function header() {
   )
 }
 
-export default header
+export default Header

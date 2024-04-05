@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { IoPencil } from 'react-icons/io5'
 import { MdLocationOn } from 'react-icons/md'
 import { Link } from 'react-router-dom'
@@ -8,7 +8,7 @@ import offer1 from '../assests/offer1.png'
 import offer1Mobile from '../assests/offer1Mobile.png'
 import Box from '../components/Box'
 import SliderAuto from '../components/SliderAuto'
-import { accessoriesData } from '../data/index.js'
+import { accessoriesData } from '../data/accessories.js'
 import Card from '../components/Card'
 
 import toptrend from '../assests/toptrend.png'
@@ -23,7 +23,7 @@ import washingM from "../assests/washingmachine.png"
 import tab from "../assests/tablet.png"
 import speaker from "../assests/speakers.png"
 import wear from '../assests/wearable.png'
-import kitchenappliances from '../assests/kitchenappliances.png'
+import kitchenappliance from '../assests/kitchenappliances.png'
 import grooming from '../assests/grooming.png'
 import waterpurifiers from '../assests/waterpurifiers.png'
 
@@ -51,13 +51,120 @@ import newatcroma9 from '../assests/newatcroma9.avif'
 import newatcroma10 from '../assests/newatcroma10.avif'
 import newatcroma11 from '../assests/newatcroma11.avif'
 import newatcroma12 from '../assests/newatcroma12.avif'
-
-
-
+import { DealOfTheDay } from '../data/DealOfTheday.js'
+import axios from 'axios'
 
 const Home = () => {
-     console.log(accessoriesData)
-  return (
+     // useEffect(()=>{
+     //      axios({
+     //        method: "GET",
+     //        url:"https://academics.newtonschool.co/api/v1/ecommerce/electronics/categories",
+     //        headers:{
+     //          projectID: "f104bi07c490"
+     //        }
+     //        }).then(res => {
+     //        console.log("res", res)
+     //        })
+     //        .catch(e => {
+     //        console.error(e)
+     //        })
+     //    },[])
+     const [state, setState] = useState({
+          DealOfTheDayData:[],
+          TopTrendingDeal:[]
+     })
+     useEffect(()=>{
+         let promises=[ axios({
+          method: "GET",
+          url:'https://academics.newtonschool.co/api/v1/ecommerce/electronics/products?sort={"price":-1}',
+          headers:{
+            projectID: "f104bi07c490"
+          }
+          }),
+          axios({
+               method: "GET",
+               url:'https://academics.newtonschool.co/api/v1/ecommerce/electronics/products?sort={"rating":-1}',
+               headers:{
+                 projectID: "f104bi07c490"
+               }
+               })]
+          Promise.all(promises).then(res => {
+          if(res.length > 0){
+             setState(s=>({...s, DealOfTheDayData: res[0].data.data, TopTrendingDeal: res[1].data.data}))
+             
+          }
+          
+               console.log("res", res)
+          })
+
+         
+        },[])
+     
+        const [airConditioners, setairConditioners] = useState([])
+        const [televisions, setTelevisions] = useState([])
+        const [kitchenappliances, setKitchenappliances] = useState([])
+
+       
+     useEffect(()=>{
+
+          axios({
+            method: "GET",
+            url:'https://academics.newtonschool.co/api/v1/ecommerce/electronics/products?filter={"subCategory":"ac"}',
+
+            headers:{
+              projectID: "f104bi07c490"
+            }
+            }).then(res => {
+               setairConditioners(res.data.data)
+          //   console.log("res", res)
+            })
+            .catch(e => {
+            console.error(e)
+            })
+        },[])
+
+        useEffect(()=>{
+
+          axios({
+            method: "GET",
+            url:'https://academics.newtonschool.co/api/v1/ecommerce/electronics/products?filter={"subCategory":"tv"}',
+
+            headers:{
+              projectID: "f104bi07c490"
+            }
+            }).then(res => {
+               setTelevisions(res.data.data)
+            console.log("des", res)
+            })
+            .catch(e => {
+            console.error(e)
+            })
+        },[])
+
+         useEffect(()=>{
+
+          axios({
+            method: "GET",
+            url:'https://academics.newtonschool.co/api/v1/ecommerce/electronics/products?filter={"subCategory":"kitchenappliances"}',
+
+            headers:{
+              projectID: "f104bi07c490"
+            }
+            }).then(res => {
+               setKitchenappliances(res.data.data)
+          //   console.log("des", res)
+            })
+            .catch(e => {
+            console.error(e)
+            })
+        },[])
+
+     
+
+     
+
+  
+     return (
     <div className='text-white'>
          <div className='flex items-center gap-2 md:hidden 10 bg-black text-white'>
                 <MdLocationOn className='text-xl'/>
@@ -94,13 +201,38 @@ const Home = () => {
                 <img src={tab} className='w-14 md:min-w-[125px]' alt='tablet'/>
                 <img src={speaker} className='w-14 md:min-w-[125px]' alt='speakers'/>
                 <img src={wear} className='w-14 md:min-w-[125px]' alt='wearable'/>
-                <img src={kitchenappliances} className='w-14 md:min-w-[125px]' alt='kitchenappliances'/>
+                <img src={kitchenappliance} className='w-14 md:min-w-[125px]' alt='kitchenappliances'/>
                 <img src={grooming} className='w-14 md:min-w-[125px]' alt='grooming'/>
                 <img src={waterpurifiers} className='w-14 md:min-w-[125px]' alt='waterpurifiers'/>
                 
             </div>
          </SliderAuto>
 
+
+            {/* {DealOfTheDay} */}
+            <h2 className='font-medium text-2xl my-5'>Deals Of The Day</h2>
+            <div>
+                    <SliderAuto width={285}>
+                         {
+                              state.DealOfTheDayData?.map((el) =>{
+                                  // console.log("el", el)
+                                   return(
+                                      <Card
+                                      key = {el.id}
+                                      id = {el.id}
+                                   //    title = {el.brand}
+                                      name = {el.name}
+                                      img = {el.displayImage}
+                                      pricesell = {el.price}
+                                      pricedis = {"99999"}
+                                      rating = {el.ratings}
+                                      />
+                                   )
+                              })
+                         }
+                    </SliderAuto>
+               </div>
+                 
 
 
              {/* {Highlights} */}
@@ -118,14 +250,44 @@ const Home = () => {
                   <img src={hightlight7} className='h-44 md:h-60 rounded-lg' alt='hightlight7'/>
              </SliderAuto>
 
-             <SliderAuto width={380} isflex='felx'>
+             <SliderAuto width={380} isflex='flex'>
                   <img src={hightlight8} className='h-44 md:h-60 rounded-lg' alt='hightlight4'/>
                   <img src={hightlight9} className='h-44 md:h-60 rounded-lg' alt='hightlight5'/>
                   <img src={hightlight10} className='h-44 md:h-60 rounded-lg' alt='hightlight6'/>
                   <img src={hightlight11} className='h-44 md:h-60 rounded-lg' alt='hightlight7'/>
              </SliderAuto>
 
-                
+
+                {/* {Top Trending Deals} */}
+             <h2 className='font-medium text-2xl my-5'>Top Trending Deals</h2>
+             <div>
+                    <SliderAuto width={285}>
+                         {
+                              state.TopTrendingDeal?.map((el) =>{
+                                   
+                                   return(
+                                      <Card
+                                      key = {el.id}
+                                      id = {el.id}
+                                   //    title = {el.brand}
+                                      name = {el.name}
+                                      img = {el.displayImage}
+                                      pricesell = {el.price}
+                                      pricedis = {9999}
+                                      rating = {el.ratings}
+
+                                      />
+                                   )
+                              })
+                         }
+                    </SliderAuto>
+               </div>
+              
+
+
+
+
+
              {/* New at croma */}
              <h2 className='font-medium text-2xl my-5'>New at croma</h2>
              <div className='flex gap-4'>
@@ -147,11 +309,88 @@ const Home = () => {
                      
              </SliderAuto>
 
+             {/* {Ac} */}
+             <h2 className='font-medium text-2xl my-5'>Air Conditioners</h2>
+               <div>
+                    <SliderAuto width={285}>
+                         {
+                              airConditioners?.map((el) =>{
+                                   
+                                   return(
+                                      <Card
+                                      key = {el.id}
+                                      id = {el.id}
+                                   //    title = {el.title}
+                                      name = {el.name}
+                                      img = {el.displayImage}
+                                      pricesell = {el.price}
+                                      pricedis = {"9999"}
+                                      rating = {el.ratings}
+
+                                      />
+                                   )
+                              })
+                         }
+                    </SliderAuto>
+               </div>
+
+                {/* {Televisions} */}
+             <h2 className='font-medium text-2xl my-5'>Televisions</h2>
+               <div>
+                    <SliderAuto width={285}>
+                         {
+                              televisions?.map((el) =>{
+                                   
+                                   return(
+                                      <Card
+                                      key = {el.id}
+                                      id = {el.id}
+                                   //    title = {el.title}
+                                      name = {el.name}
+                                      img = {el.displayImage}
+                                      pricesell = {el.price}
+                                      pricedis = {"9999"}
+                                      rating = {el.ratings}
+
+                                      />
+                                   )
+                              })
+                         }
+                    </SliderAuto>
+               </div>
+                 
+
+                 {/* {kitchenappliances} */}
+                  <h2 className='font-medium text-2xl my-5'>Kitchen Appliances</h2>
+               <div>
+                    <SliderAuto width={285}>
+                         {
+                              kitchenappliances?.map((el) =>{
+                                   
+                                   return(
+                                      <Card
+                                      key = {el.id}
+                                      id = {el.id}
+                                   //    title = {el.title}
+                                      name = {el.name}
+                                      img = {el.displayImage}
+                                      pricesell = {el.price}
+                                      pricedis = {"9999"}
+                                      rating = {el.ratings}
+
+                                      />
+                                   )
+                              })
+                         }
+                    </SliderAuto>
+               </div>
+
+             
                  
                {/* Accessories under 999 */}
                <h2 className='font-medium text-2xl my-5'>Accessories under 999</h2>
                <div>
-                    <SliderAuto>
+                    <SliderAuto width={285}>
                          {
                               accessoriesData?.map((el) =>{
                                    
@@ -162,7 +401,7 @@ const Home = () => {
                                       title = {el.title}
                                       img = {el.img}
                                       pricesell = {el.priceSell}
-                                      pricedisc = {el.priceDi}
+                                      pricedis = {el.priceDisc}
                                       />
                                    )
                               })
