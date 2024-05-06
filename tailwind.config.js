@@ -6,7 +6,10 @@ module.exports = {
     extend: {
       colors : {
         "greenblue" : "rgb(0, 233, 191)",
-        "backgroundColor" : "#121212"
+        "backgroundColor" : "#121212",
+        green: {
+          500: '#12daa8'
+        }
       }
     },
   },

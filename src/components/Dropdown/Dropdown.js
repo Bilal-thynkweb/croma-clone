@@ -1,4 +1,5 @@
 import React, { useState, useId } from "react";
+import useClickOutside from "../../hooks/useClickOutside";
 
 function DropdownCheckboxButton(props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -6,7 +7,9 @@ function DropdownCheckboxButton(props) {
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
-  let { options = [], onChange } = props;
+  let { options = [], onChange, RenderOptions, onClick, selectedOption, heading='' } = props;
+
+  useClickOutside(isOpen, ['[data-dropdown-content]'], () => setIsOpen(false))
 
   return (
     <>
@@ -17,7 +20,7 @@ function DropdownCheckboxButton(props) {
           className="text-white bg-[#393939] leading-[20px] py-[8px]  hover:bg-[#393939] focus:ring-4 focus:ring-transparent focus:outline-none rounded-lg text-sm px-5 text-center inline-flex items-center"
           type="button"
         >
-          Dropdown checkbox{" "}
+          {selectedOption ? selectedOption.label : heading}
           <svg
             className="w-2.5 h-2.5 ms-3"
             aria-hidden="true"
@@ -38,77 +41,51 @@ function DropdownCheckboxButton(props) {
         {/* Dropdown menu */}
         {isOpen && (
           <div
-            id={RandomId}
-            className="absolute z-10 bg-[#393939] top-[38px] divide-y divide-gray-100 rounded-lg shadow w-60 dark:bg-gray-700 dark:divide-gray-600"
+            className="absolute w-[max-content] z-10 bg-[#393939] top-[38px] divide-y divide-gray-100 rounded-lg shadow w-60 dark:bg-gray-700 dark:divide-gray-600"
+            data-dropdown-content
           >
             <ul
               className="p-[6px] space-y-1 text-sm "
-              aria-labelledby={"dropdownHelperButton" + RandomId}
+
             >
-              {options.map((item, index) => {
-                return (
-                  <li key={item.label}>
-                    <div className="flex p-2 rounded py-[4px] dark:hover:bg-gray-600">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="helper-checkbox-1"
-                          aria-describedby="helper-checkbox-text-1"
-                          type="checkbox"
-                          value=""
-                          onChange={() => onChange(item)}
-                          className="w-5 h-5 text-[#12daa8] bg-[#393939] border-gray-300 focus:ring-transparent "
-                        />
-                      </div>
-                      <div className="ms-2 text-sm">
-                        <label
-                          htmlFor="helper-checkbox-1"
-                          className=" text-[white] dark:text-gray-300"
-                        >
-                          <div>{item.label}</div>
-                        </label>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-              {/* <li>
-              <div className="flex p-2 py-[4px] rounded  dark:hover:bg-gray-600">
-                <div className="flex items-center h-5">
-                  <input
-                    id="helper-checkbox-2"
-                    aria-describedby="helper-checkbox-text-2"
-                    type="checkbox"
-                    value=""
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-                  />
-                </div>
-                <div className="ms-2 text-sm">
-                  <label htmlFor="helper-checkbox-2" className=" text-[white] dark:text-gray-300">
-                    <div>Enable 2FA auth</div>
-                   
-                  </label>
-                </div>
-              </div>
-            </li>
-            <li>
-              <div className="flex p-2 py-[4px] rounded ">
-                <div className="flex items-center h-5">
-                  <input
-                    id="helper-checkbox-3"
-                    aria-describedby="helper-checkbox-text-3"
-                    type="checkbox"
-                    value=""
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-                  />
-                </div>
-                <div className="ms-2 text-sm">
-                  <label htmlFor="helper-checkbox-3" className=" text-[white] dark:text-gray-300">
-                    <div>Subscribe newsletter</div>
-                    
-                  </label>
-                </div>
-              </div>
-            </li> */}
+              {RenderOptions
+                ? options.map((item, index) => {
+                    return (
+                      <li
+                        key={item.id}
+                        onClick={() => onClick(item)}
+                        className="hover:bg-[#ffffff21]"
+                      >
+                        <RenderOptions item={item} selectedOption={selectedOption} />
+                      </li>
+                    );
+                  })
+                : options.map((item, index) => {
+                    return (
+                      <li key={item.id} className="hover:bg-[#ffffff21]">
+                        <div className="flex p-2 rounded py-[4px] dark:hover:bg-gray-600">
+                          <div className="flex items-center h-5">
+                            <input
+                              id={item.id}
+                              aria-describedby="helper-checkbox-text-1"
+                              type="checkbox"
+                              value=""
+                              onChange={() => onChange(item)}
+                              className="w-5 h-5 text-[#12daa8] bg-[#393939] border-gray-300 focus:ring-transparent "
+                            />
+                          </div>
+                          <div className="ms-2 text-sm">
+                            <label
+                              htmlFor={item.id}
+                              className=" text-[white] dark:text-gray-300"
+                            >
+                              <div>{item.label}</div>
+                            </label>
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
             </ul>
           </div>
         )}

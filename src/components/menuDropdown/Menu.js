@@ -25,11 +25,10 @@ const Menu = (props) => {
       console.error(e)
       })
   },[])
-  console.log(globalState)
   if(props.show===false) return null
   
   return (
-    <div className='absolute top-[2rem] left-[-10rem] w-[20rem] bg-[#353535] overflow-y-scroll'>
+    <div data-menu className='absolute z-[1] h-[34rem] top-[3rem] left-[-10rem] w-[20rem] bg-[#353535] overflow-y-scroll'>
                     <section>
                       <ul className='pb-[1rem]'>
                         <li className=' px-[1rem] pt-[1rem] group hover:bg-[lightblue]'>

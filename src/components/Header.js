@@ -29,6 +29,10 @@ function Header() {
     setSearchFocused(false);
   };
 
+  const onModalClose = () => {
+    setModalOpen(false)
+  }
+
   const handleChange = (e) => {
     let text = e.target.value;
     setSearch(e.target.value);
@@ -49,6 +53,7 @@ function Header() {
   };
 
   useClickOutside(isSearchFocused, ["[data-search-content]"], onClose);
+  useClickOutside(isModalOpen, ["[data-menu]"], onModalClose);
 
   return (
     <header className="bg-black text-white flex justify-between h-20">
@@ -70,6 +75,7 @@ function Header() {
                   <RxCross1
                     className="text-3xl menubar cursor-pointer"
                     onClick={() => {
+                      document.body.style.overflow='unset'
                       setModalOpen(false);
                     }}
                   />
@@ -77,6 +83,7 @@ function Header() {
                   <IoMenuOutline
                     className="text-3xl"
                     onClick={() => {
+                      document.body.style.overflow='hidden'
                       setModalOpen(true);
                     }}
                   />
@@ -91,6 +98,12 @@ function Header() {
                 <p className="text-sm">Menu</p>
                 {/* {isModalOpen && <Menu />} */}
                 <Menu show={isModalOpen} />
+                {
+                  isModalOpen &&
+                <div className="fixed bg-[#00000078] w-[100%] h-[100vh] left-0">
+                  
+                </div>
+                }
               </div>
             </div>
             <div className="flex items-center bg-white h-9 w-full max-w-md px-2 rounded-md relative">
@@ -106,17 +119,17 @@ function Header() {
               {isSearchFocused && searchResult.length > 0 && (
                 <div
                   data-search-content
-                  className="absolute px-[1rem] pt-[.5rem] bg-black top-10 left-0 w-[100%] gap-[.5rem] pb-[10px] flex flex-col"
+                  className="absolute max-h-[25rem] overflow-y-auto px-[1rem] pt-[.5rem] bg-black top-10 left-0 w-[100%] gap-[.5rem] pb-[10px] flex flex-col"
                 >
                   {searchResult.map((item) => {
                     return (
                       <Link
-                        to={`/listing?search=${search}&brand=${item.brand}&subCategory=${item.subCategory}`}
-                        key={item.id}
+                        to={`/listing?search=${search}&brand=${item.brand}&subCategory=${item.subCategory} w-[100%]`}
+                        key={item._id}
                       >
                         <a
                           onClick={() => onClose(item)}
-                          className="text-md text-[15px]  border-b border-b-[white]"
+                          className="text-md text-[15px]  border-b border-b-[white] block w-[100%]"
                         >
                           {item.brand + " " + item.subCategory}
                         </a>
